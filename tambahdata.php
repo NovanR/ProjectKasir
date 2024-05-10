@@ -1,7 +1,54 @@
-<?php 
-setlocale(LC_TIME, 'id_ID');
-$nama_hari = strftime('%A');
+<?php
 
+require 'functions.php';
+// Buat objek DateTime untuk mendapatkan tanggal saat ini
+$date = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
+// Buat formatter untuk menampilkan nama hari dalam bahasa Indonesia
+$formatter = new IntlDateFormatter('id_ID', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN);
+
+
+function tambah($data)
+{
+  global $conn;
+
+  // ambil data dari tiap elemen
+  $tanggal = htmlspecialchars($data['date']);
+  $kiloanAyam = htmlspecialchars($data["kiloanAyam"]);
+  $hargaAyam = htmlspecialchars($data["hargaAyam"]);
+  $totalAyam = $kiloanAyam * $hargaAyam;
+  $kiloanTulang = htmlspecialchars($data["kiloanTulang"]);
+  $hargaTulang = 11000;
+  $totalTulang = $kiloanTulang * $hargaTulang;
+  $grandTotal = $totalAyam - $totalTulang;
+
+  // query insert
+  $query = "INSERT INTO hitung
+  VALUES
+  (null,'$tanggal','$kiloanAyam','$hargaAyam','$totalAyam','$kiloanTulang','$hargaTulang','$totalTulang', '$grandTotal')";
+
+  mysqli_query($conn, $query);
+
+  return mysqli_affected_rows($conn);
+
+}
+
+
+// cek tombol submit sudah ditekan atau belum
+if (isset($_POST["submit"])) {
+
+
+
+  // cek data apakah berhasil/tidak
+  if (tambah($_POST) > 0) {
+    echo "<script>
+      alert('data berhasil ditambahkan!');
+      </script>";
+  } else {
+    echo "<script>
+          alert('data gagal ditambahkan!');   
+      </script>";
+  }
+}
 ?>
 
 
@@ -25,16 +72,26 @@ $nama_hari = strftime('%A');
 <body>
 
   <div class="tambah">
-    <form action="index.php" method="POST">
+    <form action="" method="post" enctype="multipart/form-data">
       <div class="mb-3">
         <label for="date">Tanggal:</label>
-        <input type="text" id="date" name="date" value="<?php echo date($nama_hari.'d-m-Y'); ?>" readonly </div>
+        <input type="text" id="date" name="date" value="<?php echo date('d-m-Y'); ?>" readonly>
         <br>
         <div class="mb-3">
           <label for="kiloanAyam" class="form-label"> Kiloan ayam</label>
           <input type="text" class="form-control" id="kiloanAyam" name="kiloanAyam">
         </div>
+        <div class="mb-3">
+          <label for="hargaAyam" class="form-label"> Harga Ayam</label>
+          <input type="text" class="form-control" id="hargaAyam" name="hargaAyam">
+        </div>
+        <div class="mb-3">
+          <label for="kiloanTulang" class="form-label"> Kiloan Tulang</label>
+          <input type="text" class="form-control" id="kiloanTulang" name="kiloanTulang">
+        </div>
         <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+        <br><br>
+        <a href="index.php" style="color: black;">Kembali Ke halaman admin</a>
     </form>
   </div>
 

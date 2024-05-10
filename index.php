@@ -1,40 +1,10 @@
 <?php
-// Konfigurasi koneksi ke database
-$servername = "localhost"; // Ganti dengan nama server Anda
-$username = "root"; // Ganti dengan username database Anda
-$password = ""; // Ganti dengan password database Anda
-$dbname = "ayam"; // Ganti dengan nama database Anda
-
-// Membuat koneksi
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Memeriksa koneksi
-if ($conn->connect_error) {
-  die("Koneksi gagal: " . $conn->connect_error);
-}
-
-// // Mengambil data dari form
-// $jumlahAyam = $_POST['jumlah_ayam'];
-// $hargaAyam = $_POST['harga_ayam'];
-// $totalAyam= $_POST['total_ayam'];
-// $jumlahTulang = $_POST['jumlah_tulang'];
-// $hargaTulang = $_POST['harga_tulang'];
-// $totalTulang = $_POST['total_tulang'];
-// $grandTotal = $_POST['grand_total'];
+require 'functions.php';
+$ayam = query('SELECT * FROM hitung');
 
 
-// // Menyimpan data ke dalam database
-// $sql = "INSERT INTO hitung (jumlah_kiloan, harga_ayam, total_ayam, tulang, harga_tulang, total_tulang, grand_total) 
-//         VALUES ($kiloAyam, $hargaAyam, $totalAyam, $jumlahTulang, $hargaTulang, $totalTulang, $grandTotal)";
+// while ($mhs = mysqli_fetch_assoc($result)) {}
 
-// if ($conn->query($sql) === TRUE) {
-//     echo "Data berhasil disimpan.";
-// } else {
-//     echo "Error: " . $sql . "<br>" . $conn->error;
-// }
-
-// Menutup koneksi
-$conn->close();
 ?>
 
 
@@ -76,33 +46,47 @@ $conn->close();
           <tr>
             <th scope="col">No</th>
             <th scope="col">Tanggal</th>
-
-            <th scope="col">Jumlah Kiloan Ayam</th>
-            <th scope="col">Jumlah Kiloan Tulang</th>
+            <th scope="col">Jumlah Kiloan</th>
+            <th scope="col">Harga Total</th>
             <th scope="col">Total</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td></td>
-            <td><?= $_POST["kiloanAyam"]; ?></td>
-            <td>@mdo</td>
-            <td>50000</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>100000</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>Larry the Bird</td>
-            <td>cek</td>
-            <td>@twitter</td>
-          </tr>
+          <?php foreach ($ayam as $row): ?>
+            <tr>
+              <td><?= $row["No"]; ?></td>
+              <td><?= $row["tanggal"]; ?></td>
+              <td>Ayam <?= $row["jumlah_kiloan"]; ?> Kg X Rp <?= $row["harga_ayam"]; ?>
+                <br>
+                <p>Tulang <?= $row["tulang"]; ?> Kg X 11000</p>
+              </td>
+              <td><?php
+              echo "Rp ";
+              $harga_total_ayam = $row["jumlah_kiloan"] * $row["harga_ayam"];
+              echo $harga_total_ayam;
+              ?>
+
+                <br>
+                <?php
+
+                echo "Rp ";
+                $harga_total_tulang = $row["tulang"] * 11000;
+                echo $harga_total_tulang;
+                ?>
+              </td>
+              <td>
+                <?php
+                echo "Rp ";
+                echo $harga_total_ayam . " - ". $harga_total_tulang. " = ";
+                $total = $harga_total_ayam - $harga_total_tulang;
+                echo "Rp ";
+                echo $total;
+
+                ?>
+
+              </td>
+            </tr>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </div>
